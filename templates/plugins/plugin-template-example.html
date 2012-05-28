@@ -1,0 +1,13 @@
+<li>
+      <h1>Custom template</h1>
+			<span class="css-rule-path"></span>
+			<h2><%= typeof cssObj.name !== 'undefined' ? cssObj.name + ' (' + rule.mSelectorText +')' : rule.mSelectorText %></h2>
+			<p><%= typeof cssObj.description !== 'undefined' ? cssObj.description : '<p class="no-documentation">No documentation</p>'%></p>
+			<% if(typeof cssObj.markup !== 'undefined') { %>
+			<h3>Template</h3>
+			<iframe class="style-demo" data-css="<style><%=  css %></style>" data-content='<%= typeof cssObj.markup !== 'undefined' ? cssObj.markup : 'No Markup'%>'></iframe>
+			<% }; %>
+			</div>
+			<h3>Css</h3>
+			<pre class="brush: css"><%=  css %></pre>
+	</li>

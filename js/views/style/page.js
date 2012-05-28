@@ -4,16 +4,23 @@ define([
   'backbone',
   'text!templates/style/page.html',
   'jscssp',
-  'config'
-], function($, _, Backbone, stylePageTemplate, jscssp, config){
+  'config',
+  'text!templates/plugins/plugin-template-example.html'
+], function($, _, Backbone, stylePageTemplate, jscssp, config, pluginTemplate){
   var StylePage = Backbone.View.extend({
     el: '.style-page',
     render: function () {
       var that = this;
-		 require(['text!'+ config.css_path + '/' + this.options.style], function (stylesheet){
-       var parser = new jscssp();
+      require(['text!'+ config.css_path + '/' + this.options.style], function (stylesheet){
+        var parser = new jscssp();
+        stylesheet = parser.parse(stylesheet, false, true);
 
-        var stylesheet = parser.parse(stylesheet, false, true);
+        _.each(stylesheet.cssRules, function(rule) {
+          if(rule.type === 1) {
+            rule.template = _.template(pluginTemplate);
+          }
+        });
+
         $(that.el).html(_.template(stylePageTemplate, {_:_, stylesheet: stylesheet}));
         _.each($('iframe'), function(iframe) {
           $(iframe).contents().find('body').html($(iframe).attr('data-content'));
@@ -27,7 +34,6 @@ define([
         SyntaxHighlighter.highlight();
       });
 
-      
     }
   });
   return StylePage;
