@@ -14,7 +14,6 @@ define([
       $(this.el).html(layoutTemplate);
       require(['views/style/menu'], function (StyleMenuView) {
         var styleMenuView = Vm.create(that, 'StyleMenuView', StyleMenuView);
-        styleMenuView.render();
       });
 
 

@@ -8,52 +8,60 @@ define([
 ], function($, _, Backbone, dashboardPageTemplate, jscssp, config){
   var DashboardPage = Backbone.View.extend({
     el: '.style-menu',
+    initialize: function() {
+      var files = config.files || ["style.css"],
+          loadStatuses = [];
+      _.bindAll(this, "render");
+      this.$el.html('Loading styles');
+      this.importRules = [];
+
+      _.each(files, function(filename) {
+        var loaded = $.Deferred();
+        require(['text!' + config.css_path + '/' + filename], this.readSheet.bind(this, loaded));
+        loadStatuses.push(loaded);
+        this.importRules.push({ type: 3, href: "url( " + filename + " )" });
+      }.bind(this));
+
+
+      $.when.apply($, loadStatuses).then(this.render);
+    },
     render: function () {
-      var that = this;
-      that.$el.html('Loading styles');
-      require(['text!' + config.css_path + '/styles.css'], function (styles) {
+      this.$el.html(_.template(dashboardPageTemplate, {_:_, importRules: this.importRules}));
+      $('[href="' + window.location.hash + '"]').addClass('active');
+    },
+    readSheet: function(loaded, styles) {
+      var parser = new jscssp();
+      var sheet = parser.parse(styles, false, true);
+      var rules = _.map(sheet.cssRules, this.readMeta);
 
-        var parser = new jscssp();
-        var sheet = parser.parse(styles, false, true);
-        console.log(sheet);
-        var rules = [];
-        _.each(sheet.cssRules, function (rule){
-          var cssObj = {};
-          if(rule.type === 101) {
-            var css = rule.parsedCssText;
-            css = css.replace('/*', '');
-            css = css.replace('*/', '');
-            var cssLines = css.split('\n');
-            _.each(cssLines, function(line){
-             var splits = line.match(/([^:]*)\:(.*)/);
-              console.log(splits);
-              if(splits !== null) {
-                cssObj[splits[1].toLowerCase()] = splits[2];
-              }
-            });
-          };
-          rule.metadata = cssObj;
-          rules.push(rule);
-        });
+      var importRules = _.filter(sheet.cssRules, function (rule) {
+        if(rule.type === 3){
+          return true;
+        } 
+        if(rule.type === 101 && typeof rule.metadata.category !== 'undefined') {
+          return true;
+        }
+      });
+      this.importRules = this.importRules.concat(importRules);
 
-
-
-        var importRules = _.filter(sheet.cssRules, function (rule) {
-          if(rule.type === 3){
-            return true;
-          } 
-          console.log(rule.metadata + 'asasd');
-          if(rule.type === 101 && typeof rule.metadata.category !== 'undefined') {
-            return true;
-
+      loaded.resolve();
+    },
+    readMeta: function(rule) {
+      var cssObj = {};
+      if(rule.type === 101) {
+        var css = rule.parsedCssText;
+        css = css.replace('/*', '');
+        css = css.replace('*/', '');
+        var cssLines = css.split('\n');
+        _.each(cssLines, function(line){
+          var splits = line.match(/([^:]*)\:(.*)/);
+          if(splits !== null) {
+            cssObj[splits[1].toLowerCase()] = splits[2];
           }
         });
-        
-     
-        $(that.el).html(_.template(dashboardPageTemplate, {_:_, importRules: importRules}));
-        $('[href="' + window.location.hash + '"]').addClass('active');
-      });
-      
+      }
+      rule.metadata = cssObj;
+      return rule;
     },
     events: {
       'click a': function (ev) {
