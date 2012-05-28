@@ -32,8 +32,16 @@ define([
          fixie.init($(':empty', $('iframe').contents().find('body')));
         });
         SyntaxHighlighter.highlight();
+        $(".syntaxhighlighter").hide();
       });
 
+    },
+    events: {
+      "click .js-show": "showCSS"
+    },
+    showCSS: function(e) {
+      e.preventDefault();
+      $(e.target).parent().find(".syntaxhighlighter").toggle();
     }
   });
   return StylePage;
