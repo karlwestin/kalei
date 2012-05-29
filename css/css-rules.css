@@ -14,6 +14,7 @@ Description: This style creates the box you see around this css rule!
 	background: #fbfbfb;
 	border: 1px solid #ebebeb;
 	margin-bottom: 20px;
+  clear: both;
 }
 
 /*

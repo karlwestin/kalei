@@ -1,10 +1,8 @@
-<li>
-			<span class="css-rule-path"></span>
+  <li class="user-color-box">
 			<h2><%= typeof cssObj.name !== 'undefined' ? cssObj.name + ' (' + rule.mSelectorText +')' : rule.mSelectorText %></h2>
 			<p><%= typeof cssObj.description !== 'undefined' ? cssObj.description : '<p class="no-documentation">No documentation</p>'%></p>
 			<% if(typeof cssObj.markup !== 'undefined') { %>
-			<h3>Template</h3>
-			<iframe class="style-demo" data-css="<style><%=  css %></style>" data-content='<%= typeof cssObj.markup !== 'undefined' ? cssObj.markup : 'No Markup'%>'></iframe>
+			<iframe class="style-demo" data-css="<style><%= css %></style>" data-content='<%= typeof cssObj.markup !== 'undefined' ? cssObj.markup : 'No Markup'%>'></iframe>
 			<% }; %>
 			<a href="#" class="js-show">Show code</a>
 			<pre class="brush: css"><%=  css %></pre>

@@ -20,3 +20,8 @@ Category: Third party
 @import url("normalize.css");
 @import url("highlighter/shCore.css");
 @import url("highlighter/shCoreDefault.css");
+
+/*
+Category: User styles
+*/
+@import url("user.css");
